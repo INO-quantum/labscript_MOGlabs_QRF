@@ -10,31 +10,19 @@ Please copy the entire `iPCdev` and `labscript_MOGlabs_QRF` folders into your `u
 > [!Note]
 > The first simple version was tested with hardware borrowed from a neighboring laboratory. The present version has been changed a lot but could not yet been tested with hardware! But the new device should arrive soon such that this can be tested. 
 
-The implementation as a internal pseudoclock device (iPCdev) creates a separate device tab for each QRF device and offers more flexibility than an implementation as IntermediateDevice. The iPCdev class implements everything needed for labscript while the labscript_MOGlabs_QRF class takes care of the hardware and adds in blacs the checkboxes to enable the RF signals and amplifiers. Each RF channel can be configured in different modes in the [connection_table.py](https://github.com/INO-quantum/labscript_MOGlabs_QRF/tree/main/example_experiment). The possible modes are:
+The implementation as an internal pseudoclock device (iPCdev) creates a separate device tab for each QRF device and offers more flexibility than an implementation as IntermediateDevice. The iPCdev part implements everything needed for labscript while the labscript_MOGlabs_QRF part takes care of the hardware communication in the worker and adds in the blacs tab the checkboxes to enable the RF signals and amplifiers. Each RF channel can be configured in different modes in the [connection_table.py](https://github.com/INO-quantum/labscript_MOGlabs_QRF/tree/main/example_experiment). The possible modes are:
 
 | mode                               | description                                                                          |
 |------------------------------------|--------------------------------------------------------------------------------------|
-| 'NSB' or 'basic'                   | static programming of freq/amp/phase or from front panel values if nothing in script.|
-|                                    | RF on/off via digital gate. do not specify trigger_delay and trigger_duration        |
-|                                    | in experiment script but use enable/disable commands.                                |
+| 'NSB' or 'basic'                   | static programming of freq/amp/phase or from front panel values if nothing in script. RF on/off via digital gate. do not specify trigger_delay and trigger_duration in experiment script but use enable/disable             |
 |------------------------------------|--------------------------------------------------------------------------------------|
-| 'NSA' or 'advanced'                | direct programming of DDS registers.                                                 |
-|                                    | not implemented!                                                                     |
+| 'NSA' or 'advanced'                | direct programming of DDS registers. not imemented!                                  |
 |------------------------------------|--------------------------------------------------------------------------------------|
-| 'TSB' or 'table timed'             | table mode, timed by microcontroller of QRF.                                         |
-|                                    | resolution 5us + microcontroller clock drift.                        |
-|                                    | started by external trigger attached to channel 1 trigger input                      |
-|                                    | given to QRF.__init__ as DO_trg with trigger_connection = channel.                   |
-|                                    | ATTENTION: this is a different channel than given to digital_gate of QRF_DDS!        |
-|                                    |            in this case channel 1 trigger input cannot be used for channel 1,        |
-|                                    |            but triggers the entire QRF device!                                       |
-|                                    |            so use channel 1 in this mode if any channel has to be in this mode.      |
+| 'TSB' or 'table timed'             | table mode, timed by microcontroller of QRF. resolution 5us + microcontroller clock drift. started by external trigger attached to channel 1 trigger input given to QRF.__init__ as DO_trg with trigger_connection = channel.  |
 |------------------------------------|--------------------------------------------------------------------------------------|
-| 'TSB sw' or 'table timed software' | same as 'TSB' or 'table timed' but started by software trigger.                      |
-|                                    | in this mode several QRF's are not synchronized!                                     |
+| 'TSB sw' or 'table timed software' | same as 'TSB' or 'table timed' but started by software trigger. in this mode several QRF's are not synchronized! |
 |------------------------------------|--------------------------------------------------------------------------------------|
-| 'TSB_trg' or 'table triggered'     | table mode, timed by external trigger given as digital_gate to QRF_DDS.              |
-|                                    | resolution 5us with relative big jitter.                                             |
+| 'TSB_trg' or 'table triggered'     | table mode, timed by external trigger given as digital_gate to QRF_DDS. resolution 5us with relative big jitter. |
 |------------------------------------|--------------------------------------------------------------------------------------|
 
 The example connection table is a bit complex since it is used also to test several configurations of type of other devices in the system: either FPGA_device or other iPCdev boards or stand-alone QRF. In a real experiment it would be simpler since only one of these configuration is used.
