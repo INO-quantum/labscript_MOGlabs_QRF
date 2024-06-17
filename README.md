@@ -14,16 +14,14 @@ The implementation as an internal pseudoclock device (iPCdev) creates a separate
 
 | mode                               | description                                                                          |
 |------------------------------------|--------------------------------------------------------------------------------------|
-| 'NSB' or 'basic'                   | static programming of freq/amp/phase or from front panel values if nothing in script. RF on/off via digital gate. do not specify trigger_delay and trigger_duration in experiment script but use enable/disable             |
-|------------------------------------|--------------------------------------------------------------------------------------|
-| 'NSA' or 'advanced'                | direct programming of DDS registers. not imemented!                                  |
-|------------------------------------|--------------------------------------------------------------------------------------|
-| 'TSB' or 'table timed'             | table mode, timed by microcontroller of QRF. resolution 5us + microcontroller clock drift. started by external trigger attached to channel 1 trigger input given to QRF.__init__ as DO_trg with trigger_connection = channel.  |
-|------------------------------------|--------------------------------------------------------------------------------------|
-| 'TSB sw' or 'table timed software' | same as 'TSB' or 'table timed' but started by software trigger. in this mode several QRF's are not synchronized! |
-|------------------------------------|--------------------------------------------------------------------------------------|
-| 'TSB_trg' or 'table triggered'     | table mode, timed by external trigger given as digital_gate to QRF_DDS. resolution 5us with relative big jitter. |
-|------------------------------------|--------------------------------------------------------------------------------------|
+| 'NSB' or 'basic'                   | Static programming of frequency/amplitude/phase (do not give a time) or from front panel values if nothing in script. In script use enable/disable commands to switch RF on/off at specific times[^1].                         |
+| 'NSA' or 'advanced'                | Direct programming of DDS registers not yet implemented.                             |
+| 'TSB' or 'table timed'             | Dynamic programming of frequency/amplitude/phase at specific time in table mode. Timing is given by microcontroller of QRF with resolution 5μs + microcontroller clock drift. Execution is started by an external trigger attached to channel 1 trigger input[^2]. To improve the drift it should be possible to re-trigger the QRF (not yet implemented).            |
+| 'TSB sw' or 'table timed software' | Same as 'TSB' or 'table timed' but started by software trigger. in this mode several QRF's are not synchronized! |
+| 'TSB_trg' or 'table triggered'     | Dynamic programming of frequency/amplitude/phase at specific time in table mode. Timing is given by channel trigger. resolution 5μs with jitter of the same order of magnitude[^1]. |
+
+[^1]: For modes `basic` and `table triggered` in connection_table give for the channel (`QRF_DDS.__init__`): digital_gate = {'device' device, 'connection': connection} with device the IntermediateDevice (iPCdev) or parent board (FPGA_device) containing the channel and connection the string describing the digital out channel (format depends on type of IntermediateDevice or parent board). Attach the specified digital output channel to the trigger input of the QRF channel.
+[^2]: For mode `table timed` in connection_table give for the QRF module (`QRF.__init__`): parent_device = IntermediateDevice and trigger_connection the connection describing the channel to be used for triggering. Connect this channel to the trigger input of channel 1 of the QRF module. Note that in this case channel 1 cannot be used in any mode requiring a channel trigger (`basic`, `table triggered`). 
 
 The example connection table is a bit complex since it is used also to test several configurations of type of other devices in the system: either FPGA_device or other iPCdev boards or stand-alone QRF. In a real experiment it would be simpler since only one of these configuration is used.
 
